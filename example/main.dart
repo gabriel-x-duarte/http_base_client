@@ -74,10 +74,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future _fatchData() async {
+    /// CHECKING IF THERE IS INTERNET
     bool check = await HttpBaseClient.checkInternetConnection;
 
     if (check) {
-      var res = await HttpBaseClient.get(Uri.parse("https://jsonplaceholder.typicode.com/users"));
+      /// MAKKING A GET CALL
+      var res = await HttpBaseClient.get(
+          Uri.parse("https://jsonplaceholder.typicode.com/users"));
 
       setState(() {
         _data = jsonEncode(jsonDecode(res.payload));

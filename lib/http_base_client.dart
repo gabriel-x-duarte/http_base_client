@@ -1,13 +1,15 @@
 library http_base_client;
 
-/// A Calculator.
+/// A minimalistic http client.
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:universal_io/io.dart';
 import 'package:http/http.dart' as http;
 
 abstract class HttpBaseClient {
-  static Future<bool> get checkInternetConnection async => await _checkInternetConnection();
+  /// TO CHECK INTERNET CONNECTION
+  static Future<bool> get checkInternetConnection async =>
+      await _checkInternetConnection();
 
   static Future<bool> _checkInternetConnection() async {
     try {
@@ -23,6 +25,7 @@ abstract class HttpBaseClient {
     }
   }
 
+  /// TO MAKE A GET REQUEST
   static Future<HttpBaseClientResponse> get(
     Uri uri, [
     Map<String, String>? headers = const {
@@ -50,6 +53,7 @@ abstract class HttpBaseClient {
     return _res;
   }
 
+  /// TO MAKE A POST REQUEST
   static Future<HttpBaseClientResponse> post(
     Uri uri, [
     Map<String, String>? headers = const {
@@ -79,6 +83,7 @@ abstract class HttpBaseClient {
     return _res;
   }
 
+  /// TO MAKE A PUT REQUEST
   static Future<HttpBaseClientResponse> put(
     Uri uri, [
     Map<String, String>? headers = const {
@@ -108,6 +113,7 @@ abstract class HttpBaseClient {
     return _res;
   }
 
+  /// TO MAKE A PATCH REQUEST
   static Future<HttpBaseClientResponse> patch(
     Uri uri, [
     Map<String, String>? headers = const {
@@ -137,6 +143,7 @@ abstract class HttpBaseClient {
     return _res;
   }
 
+  /// TO MAKE A DELETE REQUEST
   static Future<HttpBaseClientResponse> delete(
     Uri uri, [
     Map<String, String>? headers = const {
@@ -180,7 +187,8 @@ class HttpBaseClientResponse {
     this._headers,
   );
 
-  factory HttpBaseClientResponse._fromHttpBaseClientResponse(http.Response _response) {
+  factory HttpBaseClientResponse._fromHttpBaseClientResponse(
+      http.Response _response) {
     return HttpBaseClientResponse._(
       _response.statusCode,
       _response.reasonPhrase ?? "",
@@ -219,4 +227,3 @@ class HttpBaseClientResponse {
     return jsonEncode(_toMap());
   }
 }
-

@@ -1,3 +1,3 @@
-## 1.0.1
+## 1.0.2
 
-Package ready for production.
+Making adjustment as convention requires
