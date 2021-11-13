@@ -4,14 +4,20 @@ library http_base_client;
 import 'dart:convert';
 
 import 'package:universal_io/io.dart';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
 abstract class HttpBaseClient {
-  /// TO CHECK INTERNET CONNECTION
+  /// To check internet connection
   static Future<bool> get checkInternetConnection async =>
       await _checkInternetConnection();
 
   static Future<bool> _checkInternetConnection() async {
+    if (kIsWeb) {
+      return true;
+    }
+
     try {
       final response = await InternetAddress.lookup("dart.dev");
 
@@ -20,19 +26,19 @@ abstract class HttpBaseClient {
       }
 
       return false;
-    } on SocketException catch (_) {
+    } catch (_) {
       return false;
     }
   }
 
-  /// TO MAKE A GET REQUEST
+  /// To make a get request
   static Future<HttpBaseClientResponse> get(
-    Uri uri, [
+    Uri uri, {
     Map<String, String>? headers = const {
       "Accept": "application/json",
       "Content-Type": "application/x-www-form-urlencoded"
     },
-  ]) async {
+  }) async {
     var client = http.Client();
 
     HttpBaseClientResponse _res;
@@ -53,15 +59,15 @@ abstract class HttpBaseClient {
     return _res;
   }
 
-  /// TO MAKE A POST REQUEST
+  /// To make a post request
   static Future<HttpBaseClientResponse> post(
-    Uri uri, [
+    Uri uri, {
     Map<String, String>? headers = const {
       "Accept": "application/json",
       "Content-Type": "application/x-www-form-urlencoded"
     },
     Object? requestBody,
-  ]) async {
+  }) async {
     var client = http.Client();
 
     HttpBaseClientResponse _res;
@@ -83,15 +89,15 @@ abstract class HttpBaseClient {
     return _res;
   }
 
-  /// TO MAKE A PUT REQUEST
+  /// To make a put request
   static Future<HttpBaseClientResponse> put(
-    Uri uri, [
+    Uri uri, {
     Map<String, String>? headers = const {
       "Accept": "application/json",
       "Content-Type": "application/x-www-form-urlencoded"
     },
     Object? requestBody,
-  ]) async {
+  }) async {
     var client = http.Client();
 
     HttpBaseClientResponse _res;
@@ -113,15 +119,15 @@ abstract class HttpBaseClient {
     return _res;
   }
 
-  /// TO MAKE A PATCH REQUEST
+  /// To make a patch request
   static Future<HttpBaseClientResponse> patch(
-    Uri uri, [
+    Uri uri, {
     Map<String, String>? headers = const {
       "Accept": "application/json",
       "Content-Type": "application/x-www-form-urlencoded"
     },
     Object? requestBody,
-  ]) async {
+  }) async {
     var client = http.Client();
 
     HttpBaseClientResponse _res;
@@ -143,15 +149,15 @@ abstract class HttpBaseClient {
     return _res;
   }
 
-  /// TO MAKE A DELETE REQUEST
+  /// To make a delete request
   static Future<HttpBaseClientResponse> delete(
-    Uri uri, [
+    Uri uri, {
     Map<String, String>? headers = const {
       "Accept": "application/json",
       "Content-Type": "application/x-www-form-urlencoded"
     },
     Object? requestBody,
-  ]) async {
+  }) async {
     var client = http.Client();
 
     HttpBaseClientResponse _res;

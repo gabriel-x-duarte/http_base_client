@@ -1,3 +1,3 @@
-## 1.0.3
+## 1.0.4
 
-Making adjustment as convention requires
+Fixing issue when code is compiled to javascript InternetAddress.lookup does not work properly

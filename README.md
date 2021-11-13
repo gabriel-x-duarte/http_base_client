@@ -14,7 +14,9 @@ and the Flutter guide for
 A minimalistic http client.
 ## Features
 
-This package simplifys http requests, making it really easy and simple.
+This package simplifies http requests, making it really easy and simple.
+
+NOTE: since the package 'universal_io' is returning an error when trying to invoke the method InternetAddress.lookup('address'), the getter checkInternetConnection will ALWAYS return true if the code was compiled to javascript. Otherwise it`s functionality remains unchanged 
 
 ## Usage
 
@@ -34,7 +36,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Basic Loading Overlay',
+      title: 'Test',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -99,13 +101,36 @@ class _MyHomePageState extends State<MyHomePage> {
     bool check = await HttpBaseClient.checkInternetConnection;
 
     if (check) {
-      /// MAKKING A GET CALL
+      /// MAKING A GET CALL
       var res = await HttpBaseClient.get(
           Uri.parse("https://jsonplaceholder.typicode.com/users"));
 
       setState(() {
         _data = jsonEncode(jsonDecode(res.payload));
       });
+
+      await Future.delayed(const Duration(seconds: 3));
+
+      /// MAKING A POST CALL
+      Map<String, dynamic> _requestBody = {
+        "title": "foo",
+        "body": "bar",
+        "userId": 1,
+      };
+
+      var res2 = await HttpBaseClient.post(
+        Uri.parse("https://jsonplaceholder.typicode.com/posts"),
+        requestBody: jsonEncode(_requestBody),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      );
+
+      if (res2.payload.isNotEmpty) {
+        setState(() {
+          _data = jsonEncode(jsonDecode(res2.payload));
+        });
+      }
     }
   }
 }
