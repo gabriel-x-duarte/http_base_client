@@ -78,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
     bool check = await HttpBaseClient.checkInternetConnection;
 
     if (check) {
-      /// MAKKING A GET CALL
+      /// MAKING A GET CALL
       var res = await HttpBaseClient.get(
           Uri.parse("https://jsonplaceholder.typicode.com/users"));
 
