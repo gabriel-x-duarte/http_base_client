@@ -14,7 +14,7 @@ and the Flutter guide for
 A minimalistic http client.
 ## Features
 
-This package simplifys http requests, making it really easy an simple.
+This package simplifys http requests, making it really easy and simple.
 
 ## Usage
 
