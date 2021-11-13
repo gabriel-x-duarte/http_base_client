@@ -1,7 +1,7 @@
 name: http_base_client
-description: A new Flutter package project.
-version: 0.0.1
-homepage:
+description: A minimalistic http client wrapped around the dart HTTP package.
+version: 1.0.0
+homepage: https://github.com/gabriel-x-duarte/http_base_client
 
 environment:
   sdk: ">=2.12.0 <3.0.0"

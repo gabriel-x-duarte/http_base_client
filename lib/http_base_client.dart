@@ -200,7 +200,7 @@ class HttpBaseClientResponse {
 
   int get status => _status;
   String get message => _message;
-  dynamic get payload => _payload;
+  String get payload => _payload;
   Map<String, String> get headers => _headers;
 
   Map<String, dynamic> _toMap() {
