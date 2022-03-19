@@ -1,10 +1,10 @@
-library http_base_client;
-
 /// A minimalistic http client.
-import 'dart:convert';
+
+library http_base_client;
 
 import 'package:universal_io/io.dart';
 
+import 'dart:convert' as converter;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
@@ -230,6 +230,56 @@ class HttpBaseClientResponse {
 
   @override
   String toString() {
-    return jsonEncode(_toMap());
+    return converter.jsonEncode(_toMap());
+  }
+}
+
+abstract class ObjectConverter {
+  static String jsonEncode(Object object) {
+    final _string = converter.json.encode(object);
+
+    return _string;
+  }
+
+  static dynamic jsonDecode(String source) {
+    final _json = converter.json.decode(source);
+
+    return _json;
+  }
+
+  static List<int> utf8Encode(String source) {
+    final _chars = converter.utf8.encode(source);
+
+    return _chars;
+  }
+
+  static String utf8Decode(List<int> source) {
+    final _string = converter.utf8.decode(source);
+
+    return _string;
+  }
+
+  static String base64Encode(List<int> source) {
+    final _string = converter.base64.encode(source);
+
+    return _string;
+  }
+
+  static List<int> base64Decode(String source) {
+    final _chars = converter.base64.decode(source);
+
+    return _chars;
+  }
+
+  static String base64UrlEncode(List<int> source) {
+    final _string = converter.base64Url.encode(source);
+
+    return _string;
+  }
+
+  static List<int> base64UrlDecode(String source) {
+    final _chars = converter.base64Url.decode(source);
+
+    return _chars;
   }
 }

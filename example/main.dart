@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:http_base_client/http_base_client.dart';
@@ -66,14 +65,14 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _fatchData,
+        onPressed: _fetchData,
         tooltip: 'fetch data',
         child: const Icon(Icons.download),
       ),
     );
   }
 
-  Future _fatchData() async {
+  Future _fetchData() async {
     /// CHECKING IF THERE IS INTERNET
     bool check = await HttpBaseClient.checkInternetConnection;
 
@@ -83,7 +82,9 @@ class _MyHomePageState extends State<MyHomePage> {
           Uri.parse("https://jsonplaceholder.typicode.com/users"));
 
       setState(() {
-        _data = jsonEncode(jsonDecode(res.payload));
+        _data = ObjectConverter.jsonEncode(
+          ObjectConverter.jsonDecode(res.payload),
+        );
       });
 
       await Future.delayed(const Duration(seconds: 3));
@@ -97,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       var res2 = await HttpBaseClient.post(
         Uri.parse("https://jsonplaceholder.typicode.com/posts"),
-        requestBody: jsonEncode(_requestBody),
+        requestBody: ObjectConverter.jsonEncode(_requestBody),
         headers: {
           'Content-type': 'application/json; charset=UTF-8',
         },
@@ -105,7 +106,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
       if (res2.payload.isNotEmpty) {
         setState(() {
-          _data = jsonEncode(jsonDecode(res2.payload));
+          _data = ObjectConverter.jsonEncode(
+            ObjectConverter.jsonDecode(res2.payload),
+          );
         });
       }
     }

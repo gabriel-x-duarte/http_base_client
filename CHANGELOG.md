@@ -1,3 +1,3 @@
-## 1.0.4
+## 1.0.5
 
-Fixing issue when code is compiled to javascript InternetAddress.lookup does not work properly
+Including a few Object Converter/Parser methods
