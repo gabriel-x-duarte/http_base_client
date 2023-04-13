@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
       await Future.delayed(const Duration(seconds: 3));
 
       /// MAKING A POST CALL
-      Map<String, dynamic> _requestBody = {
+      Map<String, dynamic> requestBody = {
         "title": "foo",
         "body": "bar",
         "userId": 1,
@@ -98,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       var res2 = await HttpBaseClient.post(
         Uri.parse("https://jsonplaceholder.typicode.com/posts"),
-        requestBody: ObjectConverter.jsonEncode(_requestBody),
+        requestBody: ObjectConverter.jsonEncode(requestBody),
         headers: {
           'Content-type': 'application/json; charset=UTF-8',
         },

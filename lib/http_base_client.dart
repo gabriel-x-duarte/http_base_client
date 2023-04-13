@@ -41,7 +41,7 @@ abstract class HttpBaseClient {
   }) async {
     var client = http.Client();
 
-    HttpBaseClientResponse _res;
+    HttpBaseClientResponse res;
 
     try {
       var response = await client.get(
@@ -49,14 +49,14 @@ abstract class HttpBaseClient {
         headers: headers,
       );
 
-      _res = HttpBaseClientResponse._fromHttpBaseClientResponse(response);
+      res = HttpBaseClientResponse._fromHttpBaseClientResponse(response);
     } catch (err) {
-      _res = HttpBaseClientResponse._fromError(err.toString());
+      res = HttpBaseClientResponse._fromError(err.toString());
     } finally {
       client.close();
     }
 
-    return _res;
+    return res;
   }
 
   /// To make a post request
@@ -70,7 +70,7 @@ abstract class HttpBaseClient {
   }) async {
     var client = http.Client();
 
-    HttpBaseClientResponse _res;
+    HttpBaseClientResponse res;
 
     try {
       var response = await client.post(
@@ -79,14 +79,14 @@ abstract class HttpBaseClient {
         body: requestBody,
       );
 
-      _res = HttpBaseClientResponse._fromHttpBaseClientResponse(response);
+      res = HttpBaseClientResponse._fromHttpBaseClientResponse(response);
     } catch (err) {
-      _res = HttpBaseClientResponse._fromError(err.toString());
+      res = HttpBaseClientResponse._fromError(err.toString());
     } finally {
       client.close();
     }
 
-    return _res;
+    return res;
   }
 
   /// To make a put request
@@ -100,7 +100,7 @@ abstract class HttpBaseClient {
   }) async {
     var client = http.Client();
 
-    HttpBaseClientResponse _res;
+    HttpBaseClientResponse res;
 
     try {
       var response = await client.put(
@@ -109,14 +109,14 @@ abstract class HttpBaseClient {
         body: requestBody,
       );
 
-      _res = HttpBaseClientResponse._fromHttpBaseClientResponse(response);
+      res = HttpBaseClientResponse._fromHttpBaseClientResponse(response);
     } catch (err) {
-      _res = HttpBaseClientResponse._fromError(err.toString());
+      res = HttpBaseClientResponse._fromError(err.toString());
     } finally {
       client.close();
     }
 
-    return _res;
+    return res;
   }
 
   /// To make a patch request
@@ -130,7 +130,7 @@ abstract class HttpBaseClient {
   }) async {
     var client = http.Client();
 
-    HttpBaseClientResponse _res;
+    HttpBaseClientResponse res;
 
     try {
       var response = await client.patch(
@@ -139,14 +139,14 @@ abstract class HttpBaseClient {
         body: requestBody,
       );
 
-      _res = HttpBaseClientResponse._fromHttpBaseClientResponse(response);
+      res = HttpBaseClientResponse._fromHttpBaseClientResponse(response);
     } catch (err) {
-      _res = HttpBaseClientResponse._fromError(err.toString());
+      res = HttpBaseClientResponse._fromError(err.toString());
     } finally {
       client.close();
     }
 
-    return _res;
+    return res;
   }
 
   /// To make a delete request
@@ -160,7 +160,7 @@ abstract class HttpBaseClient {
   }) async {
     var client = http.Client();
 
-    HttpBaseClientResponse _res;
+    HttpBaseClientResponse res;
 
     try {
       var response = await client.delete(
@@ -169,14 +169,14 @@ abstract class HttpBaseClient {
         body: requestBody,
       );
 
-      _res = HttpBaseClientResponse._fromHttpBaseClientResponse(response);
+      res = HttpBaseClientResponse._fromHttpBaseClientResponse(response);
     } catch (err) {
-      _res = HttpBaseClientResponse._fromError(err.toString());
+      res = HttpBaseClientResponse._fromError(err.toString());
     } finally {
       client.close();
     }
 
-    return _res;
+    return res;
   }
 }
 
@@ -194,16 +194,19 @@ class HttpBaseClientResponse {
   );
 
   factory HttpBaseClientResponse._fromHttpBaseClientResponse(
-      http.Response _response) {
+    http.Response response,
+  ) {
     return HttpBaseClientResponse._(
-      _response.statusCode,
-      _response.reasonPhrase ?? "",
-      _response.body,
-      _response.headers,
+      response.statusCode,
+      response.reasonPhrase ?? "",
+      response.body,
+      response.headers,
     );
   }
 
-  factory HttpBaseClientResponse._fromError(String? message) {
+  factory HttpBaseClientResponse._fromError(
+    String? message,
+  ) {
     return HttpBaseClientResponse._(
       400,
       message ?? "",
@@ -216,6 +219,20 @@ class HttpBaseClientResponse {
   String get message => _message;
   String get payload => _payload;
   Map<String, String> get headers => _headers;
+
+  Future<Object?> get data => _parsePayload();
+
+  Future<Object?> _parsePayload() async {
+    if (payload.isEmpty) {
+      return null;
+    }
+
+    try {
+      return converter.json.decode(payload);
+    } catch (e) {
+      return null;
+    }
+  }
 
   Map<String, dynamic> _toMap() {
     return {
@@ -236,50 +253,50 @@ class HttpBaseClientResponse {
 
 abstract class ObjectConverter {
   static String jsonEncode(Object object) {
-    final _string = converter.json.encode(object);
+    final string = converter.json.encode(object);
 
-    return _string;
+    return string;
   }
 
   static dynamic jsonDecode(String source) {
-    final _json = converter.json.decode(source);
+    final json = converter.json.decode(source);
 
-    return _json;
+    return json;
   }
 
   static List<int> utf8Encode(String source) {
-    final _chars = converter.utf8.encode(source);
+    final chars = converter.utf8.encode(source);
 
-    return _chars;
+    return chars;
   }
 
   static String utf8Decode(List<int> source) {
-    final _string = converter.utf8.decode(source);
+    final string = converter.utf8.decode(source);
 
-    return _string;
+    return string;
   }
 
   static String base64Encode(List<int> source) {
-    final _string = converter.base64.encode(source);
+    final string = converter.base64.encode(source);
 
-    return _string;
+    return string;
   }
 
   static List<int> base64Decode(String source) {
-    final _chars = converter.base64.decode(source);
+    final chars = converter.base64.decode(source);
 
-    return _chars;
+    return chars;
   }
 
   static String base64UrlEncode(List<int> source) {
-    final _string = converter.base64Url.encode(source);
+    final string = converter.base64Url.encode(source);
 
-    return _string;
+    return string;
   }
 
   static List<int> base64UrlDecode(String source) {
-    final _chars = converter.base64Url.decode(source);
+    final chars = converter.base64Url.decode(source);
 
-    return _chars;
+    return chars;
   }
 }
