@@ -79,7 +79,8 @@ class _MyHomePageState extends State<MyHomePage> {
     if (check) {
       /// MAKING A GET CALL
       var res = await HttpBaseClient.get(
-          Uri.parse("https://jsonplaceholder.typicode.com/users"));
+        Uri.parse("https://jsonplaceholder.typicode.com/users"),
+      );
 
       setState(() {
         _data = ObjectConverter.jsonEncode(

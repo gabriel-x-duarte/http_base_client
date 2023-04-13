@@ -5,7 +5,7 @@ library http_base_client;
 import 'package:universal_io/io.dart';
 
 import 'dart:convert' as converter;
-import 'package:flutter/foundation.dart' show kIsWeb;
+//import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
 abstract class HttpBaseClient {
@@ -14,9 +14,10 @@ abstract class HttpBaseClient {
       await _checkInternetConnection();
 
   static Future<bool> _checkInternetConnection() async {
-    if (kIsWeb) {
-      return true;
-    }
+    /// The package Universal IO now return the information properly
+    //if (kIsWeb) {
+    //  return true;
+    //}
 
     try {
       final response = await InternetAddress.lookup("dart.dev");
@@ -220,6 +221,7 @@ class HttpBaseClientResponse {
   String get payload => _payload;
   Map<String, String> get headers => _headers;
 
+  /// Returns the parsed JSON or null
   Future<Object?> get data => _parsePayload();
 
   Future<Object?> _parsePayload() async {

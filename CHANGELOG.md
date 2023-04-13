@@ -1,3 +1,6 @@
+## 1.0.7
+The InternetAddress.lookup now works on Web
+
 ## 1.0.6
 
 Including a getter "data" to return the parsed JSON

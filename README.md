@@ -16,7 +16,9 @@ A minimalistic http client.
 
 This package simplifies http requests, making it really easy and simple.
 
+<!--
 NOTE: since the package 'universal_io' is returning an error when trying to invoke the method InternetAddress.lookup('address'), the getter checkInternetConnection will ALWAYS return true if the code was compiled to javascript. Otherwise it`s functionality remains unchanged 
+-->
 
 ## Usage
 
