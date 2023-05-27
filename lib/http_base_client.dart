@@ -8,6 +8,7 @@ import 'dart:convert' as converter;
 //import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
+/// A abstract class to handle http requests
 abstract class HttpBaseClient {
   /// To check internet connection
   static Future<bool> get checkInternetConnection async =>
@@ -50,7 +51,7 @@ abstract class HttpBaseClient {
         headers: headers,
       );
 
-      res = HttpBaseClientResponse._fromHttpBaseClientResponse(response);
+      res = HttpBaseClientResponse._fromHttpResponse(response);
     } catch (err) {
       res = HttpBaseClientResponse._fromError(err.toString());
     } finally {
@@ -80,7 +81,7 @@ abstract class HttpBaseClient {
         body: requestBody,
       );
 
-      res = HttpBaseClientResponse._fromHttpBaseClientResponse(response);
+      res = HttpBaseClientResponse._fromHttpResponse(response);
     } catch (err) {
       res = HttpBaseClientResponse._fromError(err.toString());
     } finally {
@@ -110,7 +111,7 @@ abstract class HttpBaseClient {
         body: requestBody,
       );
 
-      res = HttpBaseClientResponse._fromHttpBaseClientResponse(response);
+      res = HttpBaseClientResponse._fromHttpResponse(response);
     } catch (err) {
       res = HttpBaseClientResponse._fromError(err.toString());
     } finally {
@@ -140,7 +141,7 @@ abstract class HttpBaseClient {
         body: requestBody,
       );
 
-      res = HttpBaseClientResponse._fromHttpBaseClientResponse(response);
+      res = HttpBaseClientResponse._fromHttpResponse(response);
     } catch (err) {
       res = HttpBaseClientResponse._fromError(err.toString());
     } finally {
@@ -170,7 +171,7 @@ abstract class HttpBaseClient {
         body: requestBody,
       );
 
-      res = HttpBaseClientResponse._fromHttpBaseClientResponse(response);
+      res = HttpBaseClientResponse._fromHttpResponse(response);
     } catch (err) {
       res = HttpBaseClientResponse._fromError(err.toString());
     } finally {
@@ -181,23 +182,26 @@ abstract class HttpBaseClient {
   }
 }
 
+/// A Wrapper around the http.Response class.
+/// Will return status -1 if any client side error occurs,
+/// such as NO Internet connection or Socket Exceptions
 class HttpBaseClientResponse {
-  final int _status;
-  final String _message;
-  final String _payload;
-  final Map<String, String> _headers;
+  final int status;
+  final String message;
+  final String payload;
+  final Map<String, String> headers;
 
-  const HttpBaseClientResponse._(
-    this._status,
-    this._message,
-    this._payload,
-    this._headers,
+  const HttpBaseClientResponse(
+    this.status,
+    this.message,
+    this.payload,
+    this.headers,
   );
 
-  factory HttpBaseClientResponse._fromHttpBaseClientResponse(
+  factory HttpBaseClientResponse._fromHttpResponse(
     http.Response response,
   ) {
-    return HttpBaseClientResponse._(
+    return HttpBaseClientResponse(
       response.statusCode,
       response.reasonPhrase ?? "",
       response.body,
@@ -208,18 +212,13 @@ class HttpBaseClientResponse {
   factory HttpBaseClientResponse._fromError(
     String? message,
   ) {
-    return HttpBaseClientResponse._(
-      400,
+    return HttpBaseClientResponse(
+      -1,
       message ?? "",
       "",
       {},
     );
   }
-
-  int get status => _status;
-  String get message => _message;
-  String get payload => _payload;
-  Map<String, String> get headers => _headers;
 
   /// Returns the parsed JSON or null
   Future<Object?> get data => _parsePayload();
@@ -238,18 +237,22 @@ class HttpBaseClientResponse {
 
   Map<String, dynamic> _toMap() {
     return {
-      "status": _status,
-      "message": _message,
-      "payload": _payload,
-      "headers": _headers,
+      "status": status,
+      "message": message,
+      "payload": payload,
+      "headers": headers,
     };
   }
 
-  Map<String, dynamic> get toMap => _toMap();
+  Map<String, dynamic> toMap() => _toMap();
+
+  String toJson() {
+    return converter.jsonEncode(_toMap());
+  }
 
   @override
   String toString() {
-    return converter.jsonEncode(_toMap());
+    return toJson();
   }
 }
 
