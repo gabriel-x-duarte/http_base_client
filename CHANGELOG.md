@@ -1,3 +1,6 @@
+## 1.0.9
+* Update: the field data now returns the parsed json synchronously
+
 ## 1.0.8
 * FEAT: update dependency constraints to sdk: '>=2.19.1 <4.0.0' flutter: '>=3.7.0'
 * FEAT: update libraries to be compatible with Flutter 3.10.0

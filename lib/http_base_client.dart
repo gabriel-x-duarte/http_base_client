@@ -221,9 +221,12 @@ class HttpBaseClientResponse {
   }
 
   /// Returns the parsed JSON or null
-  Future<Object?> get data => _parsePayload();
+  dynamic get data => _parsePayload();
 
-  Future<Object?> _parsePayload() async {
+  /// Returns asynchronously the parsed JSON or null
+  Future<dynamic> get dataAsFuture async => await _parsePayloadAsync();
+
+  dynamic _parsePayload() {
     if (payload.isEmpty) {
       return null;
     }
@@ -233,6 +236,10 @@ class HttpBaseClientResponse {
     } catch (e) {
       return null;
     }
+  }
+
+  Future<dynamic> _parsePayloadAsync() async {
+    return _parsePayload();
   }
 
   Map<String, dynamic> _toMap() {
