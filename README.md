@@ -23,7 +23,6 @@ NOTE: since the package 'universal_io' is returning an error when trying to invo
 ## Usage
 
 ```dart
-import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:http_base_client/http_base_client.dart';
@@ -33,7 +32,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +47,10 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({
+    super.key,
+    required this.title,
+  });
 
   final String title;
 
@@ -91,30 +93,35 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _fatchData,
+        onPressed: _fetchData,
         tooltip: 'fetch data',
         child: const Icon(Icons.download),
       ),
     );
   }
 
-  Future _fatchData() async {
+  Future _fetchData() async {
     /// CHECKING IF THERE IS INTERNET
     bool check = await HttpBaseClient.checkInternetConnection;
 
     if (check) {
       /// MAKING A GET CALL
       var res = await HttpBaseClient.get(
-          Uri.parse("https://jsonplaceholder.typicode.com/users"));
+        Uri.parse("https://jsonplaceholder.typicode.com/users"),
+      );
 
-      setState(() {
-        _data = jsonEncode(jsonDecode(res.payload));
-      });
+      if (res.body.isNotEmpty) {
+        setState(() {
+          _data = ObjectConverter.jsonEncode(
+            ObjectConverter.jsonDecode(res.body),
+          );
+        });
+      }
 
       await Future.delayed(const Duration(seconds: 3));
 
       /// MAKING A POST CALL
-      Map<String, dynamic> _requestBody = {
+      Map<String, dynamic> requestBody = {
         "title": "foo",
         "body": "bar",
         "userId": 1,
@@ -122,15 +129,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
       var res2 = await HttpBaseClient.post(
         Uri.parse("https://jsonplaceholder.typicode.com/posts"),
-        requestBody: jsonEncode(_requestBody),
+        requestBody: ObjectConverter.jsonEncode(requestBody),
         headers: {
           'Content-type': 'application/json; charset=UTF-8',
         },
       );
 
-      if (res2.payload.isNotEmpty) {
+      if (res2.body.isNotEmpty) {
         setState(() {
-          _data = jsonEncode(jsonDecode(res2.payload));
+          _data = ObjectConverter.jsonEncode(
+            ObjectConverter.jsonDecode(res2.body),
+          );
         });
       }
     }

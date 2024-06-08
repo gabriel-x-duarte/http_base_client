@@ -7,7 +7,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,10 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({
+    super.key,
+    required this.title,
+  });
 
   final String title;
 
@@ -82,11 +85,13 @@ class _MyHomePageState extends State<MyHomePage> {
         Uri.parse("https://jsonplaceholder.typicode.com/users"),
       );
 
-      setState(() {
-        _data = ObjectConverter.jsonEncode(
-          ObjectConverter.jsonDecode(res.payload),
-        );
-      });
+      if (res.body.isNotEmpty) {
+        setState(() {
+          _data = ObjectConverter.jsonEncode(
+            ObjectConverter.jsonDecode(res.body),
+          );
+        });
+      }
 
       await Future.delayed(const Duration(seconds: 3));
 
@@ -105,10 +110,10 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       );
 
-      if (res2.payload.isNotEmpty) {
+      if (res2.body.isNotEmpty) {
         setState(() {
           _data = ObjectConverter.jsonEncode(
-            ObjectConverter.jsonDecode(res2.payload),
+            ObjectConverter.jsonDecode(res2.body),
           );
         });
       }

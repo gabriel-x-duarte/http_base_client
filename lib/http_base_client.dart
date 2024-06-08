@@ -2,10 +2,9 @@
 
 library http_base_client;
 
-import 'package:universal_io/io.dart';
-
 import 'dart:convert' as converter;
-//import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io';
+
 import 'package:http/http.dart' as http;
 
 /// A abstract class to handle http requests
@@ -15,15 +14,10 @@ abstract class HttpBaseClient {
       await _checkInternetConnection();
 
   static Future<bool> _checkInternetConnection() async {
-    /// The package Universal IO now return the information properly
-    //if (kIsWeb) {
-    //  return true;
-    //}
-
     try {
       final response = await InternetAddress.lookup("dart.dev");
 
-      if (response.isNotEmpty) {
+      if (response.isNotEmpty && response[0].rawAddress.isNotEmpty) {
         return true;
       }
 
@@ -53,7 +47,7 @@ abstract class HttpBaseClient {
 
       res = HttpBaseClientResponse._fromHttpResponse(response);
     } catch (err) {
-      res = HttpBaseClientResponse._fromError(err.toString());
+      res = HttpBaseClientResponse._fromException(err.toString());
     } finally {
       client.close();
     }
@@ -83,7 +77,7 @@ abstract class HttpBaseClient {
 
       res = HttpBaseClientResponse._fromHttpResponse(response);
     } catch (err) {
-      res = HttpBaseClientResponse._fromError(err.toString());
+      res = HttpBaseClientResponse._fromException(err.toString());
     } finally {
       client.close();
     }
@@ -113,7 +107,7 @@ abstract class HttpBaseClient {
 
       res = HttpBaseClientResponse._fromHttpResponse(response);
     } catch (err) {
-      res = HttpBaseClientResponse._fromError(err.toString());
+      res = HttpBaseClientResponse._fromException(err.toString());
     } finally {
       client.close();
     }
@@ -143,7 +137,7 @@ abstract class HttpBaseClient {
 
       res = HttpBaseClientResponse._fromHttpResponse(response);
     } catch (err) {
-      res = HttpBaseClientResponse._fromError(err.toString());
+      res = HttpBaseClientResponse._fromException(err.toString());
     } finally {
       client.close();
     }
@@ -173,7 +167,7 @@ abstract class HttpBaseClient {
 
       res = HttpBaseClientResponse._fromHttpResponse(response);
     } catch (err) {
-      res = HttpBaseClientResponse._fromError(err.toString());
+      res = HttpBaseClientResponse._fromException(err.toString());
     } finally {
       client.close();
     }
@@ -186,15 +180,26 @@ abstract class HttpBaseClient {
 /// Will return status -1 if any client side error occurs,
 /// such as NO Internet connection or Socket Exceptions
 class HttpBaseClientResponse {
-  final int status;
-  final String message;
-  final String payload;
+  /// The HTTP status code for this response.
+  final int statusCode;
+
+  /// The reason phrase associated with the status code.
+  final String reasonPhrase;
+
+  /// The body of the response as a string.
+  ///
+  /// This is converted from [bodyBytes] using the charset parameter of the Content-Type header field, if available. If it's unavailable or if the encoding name is unknown, [latin1] is used by default, as per RFC 2616.
+  final String body;
+
+  /// The HTTP headers returned by the server.
+  ///
+  /// The header names are converted to lowercase and stored with their associated header values.
   final Map<String, String> headers;
 
   const HttpBaseClientResponse(
-    this.status,
-    this.message,
-    this.payload,
+    this.statusCode,
+    this.reasonPhrase,
+    this.body,
     this.headers,
   );
 
@@ -209,7 +214,7 @@ class HttpBaseClientResponse {
     );
   }
 
-  factory HttpBaseClientResponse._fromError(
+  factory HttpBaseClientResponse._fromException(
     String? message,
   ) {
     return HttpBaseClientResponse(
@@ -227,12 +232,12 @@ class HttpBaseClientResponse {
   Future<dynamic> get dataAsFuture async => await _parsePayloadAsync();
 
   dynamic _parsePayload() {
-    if (payload.isEmpty) {
+    if (body.isEmpty) {
       return null;
     }
 
     try {
-      return converter.json.decode(payload);
+      return converter.json.decode(body);
     } catch (e) {
       return null;
     }
@@ -244,9 +249,9 @@ class HttpBaseClientResponse {
 
   Map<String, dynamic> _toMap() {
     return {
-      "status": status,
-      "message": message,
-      "payload": payload,
+      "statusCode": statusCode,
+      "reasonPhrase": reasonPhrase,
+      "body": body,
       "headers": headers,
     };
   }

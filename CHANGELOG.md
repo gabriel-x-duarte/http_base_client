@@ -1,3 +1,7 @@
+## 1.1.0
+* Update: breaking change! The properties of the class [HttpBaseClientResponse] now match the properties of [http.Response] class
+* Dependency update
+
 ## 1.0.9
 * Update: the field data now returns the parsed json synchronously
 
