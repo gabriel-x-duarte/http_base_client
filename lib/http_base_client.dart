@@ -16,12 +16,12 @@ abstract class HttpBaseClient {
 
   static Future<bool> _checkInternetConnection() async {
     try {
+      const int port = 53;
+
       // return true if Platform is Web
       if (kIsWeb) {
         return true;
       }
-
-      const int port = 53;
 
       // Trying to connect with Google ip (8.8.8.8) or Cloudflare (1.1.1.1)
       return await _trySocketConnection(
@@ -60,7 +60,7 @@ abstract class HttpBaseClient {
     // Verify if internet connection is working
     if (!await _checkInternetConnection()) {
       return HttpBaseClientResponse._fromException(
-        "Sem conexão com a internet",
+        "No internet connection",
       );
     }
 
@@ -69,7 +69,7 @@ abstract class HttpBaseClient {
     HttpBaseClientResponse res;
 
     try {
-      var response = await requestCall(client);
+      final response = await requestCall(client);
 
       res = HttpBaseClientResponse._fromHttpResponse(response);
     } catch (err) {
@@ -220,12 +220,12 @@ class HttpBaseClientResponse {
   }
 
   /// Returns the parsed JSON or null
-  dynamic get data => _parsePayload();
+  dynamic get data => _parseResponseBody();
 
   /// Returns asynchronously the parsed JSON or null
-  Future<dynamic> get dataAsFuture async => await _parsePayloadAsync();
+  Future<dynamic> get dataAsFuture async => await _parseResponseBodyAsync();
 
-  dynamic _parsePayload() {
+  dynamic _parseResponseBody() {
     if (body.isEmpty) {
       return null;
     }
@@ -237,8 +237,8 @@ class HttpBaseClientResponse {
     }
   }
 
-  Future<dynamic> _parsePayloadAsync() async {
-    return _parsePayload();
+  Future<dynamic> _parseResponseBodyAsync() async {
+    return _parseResponseBody();
   }
 
   Map<String, dynamic> _toMap() {
@@ -275,7 +275,7 @@ abstract class ObjectConverter {
     return json;
   }
 
-  static List<int> utf8Encode(String source) {
+  static Uint8List utf8Encode(String source) {
     final chars = converter.utf8.encode(source);
 
     return chars;
@@ -293,7 +293,7 @@ abstract class ObjectConverter {
     return string;
   }
 
-  static List<int> base64Decode(String source) {
+  static Uint8List base64Decode(String source) {
     final chars = converter.base64.decode(source);
 
     return chars;
@@ -305,7 +305,7 @@ abstract class ObjectConverter {
     return string;
   }
 
-  static List<int> base64UrlDecode(String source) {
+  static Uint8List base64UrlDecode(String source) {
     final chars = converter.base64Url.decode(source);
 
     return chars;
