@@ -16,9 +16,7 @@ A minimalistic http client.
 
 This package simplifies http requests, making it really easy and simple.
 
-<!--
-NOTE: since the package 'universal_io' is returning an error when trying to invoke the method InternetAddress.lookup('address'), the getter checkInternetConnection will ALWAYS return true if the code was compiled to javascript. Otherwise it`s functionality remains unchanged 
--->
+NOTE: Since dart:io and Socket connections are not supported in web browsers, the checkInternetConnection getter will ALWAYS return true when the code is compiled to JavaScript (Web). For all other platforms (Mobile and Desktop), the socket-based connection check remains fully functional.
 
 ## Usage
 

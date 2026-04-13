@@ -1,3 +1,11 @@
+## 1.2.0
+* FEAT: implemented a high-performance internet connection check using `Socket.connect` on port 53 (Google/Cloudflare IPs), replacing the old lookup method.
+* REFACTOR: centralized request handling logic into a generic `_processRequest` method to ensure DRY (Don't Repeat Yourself) principles.
+* REFACTOR: improved resource management by explicitly injecting and closing `http.Client` instances for every request, preventing potential memory leaks.
+* PERF: optimized network failure detection with a 2-second socket timeout, providing faster feedback in offline scenarios.
+* PLATFORM: added a web compatibility guard (`kIsWeb`). Note: active socket connection check is bypassed on Web platforms due to browser security restrictions.
+* Dependency update: updated `http` package to the latest version (1.6.0).
+
 ## 1.1.0
 * Update: breaking change! The properties of the class [HttpBaseClientResponse] now match the properties of [http.Response] class
 * Dependency update

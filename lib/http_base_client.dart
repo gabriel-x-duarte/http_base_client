@@ -3,8 +3,9 @@
 library http_base_client;
 
 import 'dart:convert' as converter;
-import 'dart:io';
+import 'dart:io' show Socket;
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 /// A abstract class to handle http requests
@@ -15,16 +16,69 @@ abstract class HttpBaseClient {
 
   static Future<bool> _checkInternetConnection() async {
     try {
-      final response = await InternetAddress.lookup("dart.dev");
-
-      if (response.isNotEmpty && response[0].rawAddress.isNotEmpty) {
+      // return true if Platform is Web
+      if (kIsWeb) {
         return true;
       }
 
-      return false;
+      const int port = 53;
+
+      // Trying to connect with Google ip (8.8.8.8) or Cloudflare (1.1.1.1)
+      return await _trySocketConnection(
+            '8.8.8.8',
+            port,
+          ) ||
+          await _trySocketConnection(
+            '1.1.1.1',
+            port,
+          );
     } catch (_) {
       return false;
     }
+  }
+
+  static Future<bool> _trySocketConnection(String host, int port) async {
+    try {
+      final socket = await Socket.connect(
+        host,
+        port,
+        timeout: const Duration(milliseconds: 2000),
+      );
+
+      socket.destroy();
+
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Generic method to process all requests
+  static Future<HttpBaseClientResponse> _processRequest(
+    Future<http.Response> Function(http.Client client) requestCall,
+  ) async {
+    // Verify if internet connection is working
+    if (!await _checkInternetConnection()) {
+      return HttpBaseClientResponse._fromException(
+        "Sem conexão com a internet",
+      );
+    }
+
+    final client = http.Client();
+
+    HttpBaseClientResponse res;
+
+    try {
+      var response = await requestCall(client);
+
+      res = HttpBaseClientResponse._fromHttpResponse(response);
+    } catch (err) {
+      res = HttpBaseClientResponse._fromException(err.toString());
+    } finally {
+      client.close();
+    }
+
+    return res;
   }
 
   /// To make a get request
@@ -32,27 +86,15 @@ abstract class HttpBaseClient {
     Uri uri, {
     Map<String, String>? headers = const {
       "Accept": "application/json",
-      "Content-Type": "application/x-www-form-urlencoded"
+      "Content-Type": "application/x-www-form-urlencoded",
     },
   }) async {
-    var client = http.Client();
-
-    HttpBaseClientResponse res;
-
-    try {
-      var response = await client.get(
+    return _processRequest(
+      (client) => client.get(
         uri,
         headers: headers,
-      );
-
-      res = HttpBaseClientResponse._fromHttpResponse(response);
-    } catch (err) {
-      res = HttpBaseClientResponse._fromException(err.toString());
-    } finally {
-      client.close();
-    }
-
-    return res;
+      ),
+    );
   }
 
   /// To make a post request
@@ -60,29 +102,17 @@ abstract class HttpBaseClient {
     Uri uri, {
     Map<String, String>? headers = const {
       "Accept": "application/json",
-      "Content-Type": "application/x-www-form-urlencoded"
+      "Content-Type": "application/x-www-form-urlencoded",
     },
     Object? requestBody,
   }) async {
-    var client = http.Client();
-
-    HttpBaseClientResponse res;
-
-    try {
-      var response = await client.post(
+    return _processRequest(
+      (client) => client.post(
         uri,
         headers: headers,
         body: requestBody,
-      );
-
-      res = HttpBaseClientResponse._fromHttpResponse(response);
-    } catch (err) {
-      res = HttpBaseClientResponse._fromException(err.toString());
-    } finally {
-      client.close();
-    }
-
-    return res;
+      ),
+    );
   }
 
   /// To make a put request
@@ -90,29 +120,17 @@ abstract class HttpBaseClient {
     Uri uri, {
     Map<String, String>? headers = const {
       "Accept": "application/json",
-      "Content-Type": "application/x-www-form-urlencoded"
+      "Content-Type": "application/x-www-form-urlencoded",
     },
     Object? requestBody,
   }) async {
-    var client = http.Client();
-
-    HttpBaseClientResponse res;
-
-    try {
-      var response = await client.put(
+    return _processRequest(
+      (client) => client.put(
         uri,
         headers: headers,
         body: requestBody,
-      );
-
-      res = HttpBaseClientResponse._fromHttpResponse(response);
-    } catch (err) {
-      res = HttpBaseClientResponse._fromException(err.toString());
-    } finally {
-      client.close();
-    }
-
-    return res;
+      ),
+    );
   }
 
   /// To make a patch request
@@ -120,29 +138,17 @@ abstract class HttpBaseClient {
     Uri uri, {
     Map<String, String>? headers = const {
       "Accept": "application/json",
-      "Content-Type": "application/x-www-form-urlencoded"
+      "Content-Type": "application/x-www-form-urlencoded",
     },
     Object? requestBody,
   }) async {
-    var client = http.Client();
-
-    HttpBaseClientResponse res;
-
-    try {
-      var response = await client.patch(
+    return _processRequest(
+      (client) => client.patch(
         uri,
         headers: headers,
         body: requestBody,
-      );
-
-      res = HttpBaseClientResponse._fromHttpResponse(response);
-    } catch (err) {
-      res = HttpBaseClientResponse._fromException(err.toString());
-    } finally {
-      client.close();
-    }
-
-    return res;
+      ),
+    );
   }
 
   /// To make a delete request
@@ -150,29 +156,17 @@ abstract class HttpBaseClient {
     Uri uri, {
     Map<String, String>? headers = const {
       "Accept": "application/json",
-      "Content-Type": "application/x-www-form-urlencoded"
+      "Content-Type": "application/x-www-form-urlencoded",
     },
     Object? requestBody,
   }) async {
-    var client = http.Client();
-
-    HttpBaseClientResponse res;
-
-    try {
-      var response = await client.delete(
+    return _processRequest(
+      (client) => client.delete(
         uri,
         headers: headers,
         body: requestBody,
-      );
-
-      res = HttpBaseClientResponse._fromHttpResponse(response);
-    } catch (err) {
-      res = HttpBaseClientResponse._fromException(err.toString());
-    } finally {
-      client.close();
-    }
-
-    return res;
+      ),
+    );
   }
 }
 
