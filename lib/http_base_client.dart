@@ -1,6 +1,6 @@
 /// A minimalistic http client.
 
-library http_base_client;
+library;
 
 import 'dart:convert' as converter;
 import 'dart:io' show Socket;

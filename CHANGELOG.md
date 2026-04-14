@@ -1,3 +1,9 @@
+## 1.2.1
+* REFACTOR: changed the default error message from Portuguese to English ("No internet connection") for better international support.
+* REFACTOR: renamed internal JSON parsing methods to `_parseResponseBody` and `_parseResponseBodyAsync` for improved code clarity.
+* REFACTOR: updated `ObjectConverter` methods to return `Uint8List` instead of `List<int>` where applicable, aligning with modern Dart/Flutter data handling standards.
+* CHORE: minor code cleanup and internal variable naming improvements in `_processRequest`.
+
 ## 1.2.0
 * FEAT: implemented a high-performance internet connection check using `Socket.connect` on port 53 (Google/Cloudflare IPs), replacing the old lookup method.
 * REFACTOR: centralized request handling logic into a generic `_processRequest` method to ensure DRY (Don't Repeat Yourself) principles.
