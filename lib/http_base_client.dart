@@ -287,8 +287,8 @@ class HttpBaseClientResponse {
 }
 
 abstract class ObjectConverter {
-  static String jsonEncode(Object object) {
-    final string = converter.json.encode(object);
+  static String jsonEncode(Object source) {
+    final string = converter.json.encode(source);
 
     return string;
   }
