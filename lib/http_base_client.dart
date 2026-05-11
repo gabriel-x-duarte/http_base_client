@@ -1,4 +1,4 @@
-/// A minimalistic http client.
+/// A minimalistic HTTP client.
 
 library;
 
@@ -73,11 +73,11 @@ final class _HttpBaseClient implements HttpBaseClient {
   @override
   Future<bool> get checkInternetConnection async => await InternetConnectionChecker.check;
 
-  /// Generic method to process all requests
+  /// Processes all HTTP requests through a shared flow.
   Future<HttpBaseClientResponse> _processRequest(
     Future<http.Response> Function(http.Client client) requestCall,
   ) async {
-    // Verifies internet connectivity
+    // Verifies internet connectivity.
     if (!await InternetConnectionChecker.check) {
       return HttpBaseClientResponse._fromException(
         "No internet connection",
@@ -245,10 +245,10 @@ class HttpBaseClientResponse {
     );
   }
 
-  /// Returns the parsed JSON or null
+  /// Returns the parsed JSON or null.
   dynamic get data => _parseResponseBody();
 
-  /// Returns the parsed JSON asynchronously or null
+  /// Returns the parsed JSON asynchronously or null.
   Future<dynamic> get dataAsFuture async {
     return await Future<dynamic>.value(_parseResponseBody());
   }
