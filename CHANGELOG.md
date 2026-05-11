@@ -1,3 +1,11 @@
+## 1.2.2
+* FEAT: introduced the `HttpBaseClient` interface contract, enabling easy mocking and dependency abstraction in tests.
+* REFACTOR: converted the HTTP client implementation from static-only methods to an instance-based architecture.
+* REFACTOR: added a private internal implementation (`_HttpBaseClient`) while keeping a clean public factory constructor API.
+* REFACTOR: improved overall package encapsulation by hiding implementation details from consumers.
+* REFACTOR: standardized and improved inline documentation comments across the package.
+* CHORE: internal code cleanup and semantic naming improvements.
+
 ## 1.2.1
 * REFACTOR: changed the default error message from Portuguese to English ("No internet connection") for better international support.
 * REFACTOR: renamed internal JSON parsing methods to `_parseResponseBody` and `_parseResponseBodyAsync` for improved code clarity.

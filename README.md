@@ -57,6 +57,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final _httpClient = const HttpBaseClient();
+
   String _data = "";
 
   @override
@@ -99,12 +101,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future _fetchData() async {
-    /// CHECKING IF THERE IS INTERNET
-    bool check = await HttpBaseClient.checkInternetConnection;
+    // CHECK INTERNET CONNECTIVITY
+    bool hasConnection = await _httpClient.checkInternetConnection;
 
-    if (check) {
-      /// MAKING A GET CALL
-      var res = await HttpBaseClient.get(
+    if (hasConnection) {
+      /// MAKING A GET REQUEST
+      var res = await _httpClient.get(
         Uri.parse("https://jsonplaceholder.typicode.com/users"),
       );
 
@@ -118,14 +120,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
       await Future.delayed(const Duration(seconds: 3));
 
-      /// MAKING A POST CALL
+      /// MAKING A POST REQUEST
       Map<String, dynamic> requestBody = {
         "title": "foo",
         "body": "bar",
         "userId": 1,
       };
 
-      var res2 = await HttpBaseClient.post(
+      var res2 = await _httpClient.post(
         Uri.parse("https://jsonplaceholder.typicode.com/posts"),
         requestBody: ObjectConverter.jsonEncode(requestBody),
         headers: {

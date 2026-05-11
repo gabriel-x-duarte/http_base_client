@@ -8,17 +8,75 @@ import 'dart:io' show Socket;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
-/// A abstract class to handle http requests
-abstract class HttpBaseClient {
-  /// To check internet connection
-  static Future<bool> get checkInternetConnection async =>
-      await _checkInternetConnection();
+/// Defines a minimalistic HTTP client contract.
+abstract interface class HttpBaseClient {
+  const factory HttpBaseClient() = _HttpBaseClient;
 
-  static Future<bool> _checkInternetConnection() async {
+  /// Checks whether the device has internet connectivity.
+  Future<bool> get checkInternetConnection;
+
+  /// Makes a GET request.
+  Future<HttpBaseClientResponse> get(
+    Uri uri, {
+    Map<String, String>? headers = const {
+      "Accept": "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
+
+  /// Makes a POST request.
+  Future<HttpBaseClientResponse> post(
+    Uri uri, {
+    Map<String, String>? headers = const {
+      "Accept": "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    Object? requestBody,
+  });
+
+  /// Makes a PUT request.
+  Future<HttpBaseClientResponse> put(
+    Uri uri, {
+    Map<String, String>? headers = const {
+      "Accept": "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    Object? requestBody,
+  });
+
+  /// Makes a PATCH request.
+  Future<HttpBaseClientResponse> patch(
+    Uri uri, {
+    Map<String, String>? headers = const {
+      "Accept": "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    Object? requestBody,
+  });
+
+  /// Makes a DELETE request.
+  Future<HttpBaseClientResponse> delete(
+    Uri uri, {
+    Map<String, String>? headers = const {
+      "Accept": "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    Object? requestBody,
+  });
+}
+
+final class _HttpBaseClient implements HttpBaseClient {
+  const _HttpBaseClient();
+
+  /// Checks whether the device has internet connectivity.
+  @override
+  Future<bool> get checkInternetConnection async => await _checkInternetConnection();
+
+  Future<bool> _checkInternetConnection() async {
     try {
       const int port = 53;
 
-      // return true if Platform is Web
+      // Returns true on Web because dart:io socket checks are not supported.
       if (kIsWeb) {
         return true;
       }
@@ -37,7 +95,7 @@ abstract class HttpBaseClient {
     }
   }
 
-  static Future<bool> _trySocketConnection(String host, int port) async {
+  Future<bool> _trySocketConnection(String host, int port) async {
     try {
       final socket = await Socket.connect(
         host,
@@ -54,7 +112,7 @@ abstract class HttpBaseClient {
   }
 
   /// Generic method to process all requests
-  static Future<HttpBaseClientResponse> _processRequest(
+  Future<HttpBaseClientResponse> _processRequest(
     Future<http.Response> Function(http.Client client) requestCall,
   ) async {
     // Verify if internet connection is working
@@ -81,8 +139,9 @@ abstract class HttpBaseClient {
     return res;
   }
 
-  /// To make a get request
-  static Future<HttpBaseClientResponse> get(
+  /// Makes a GET request.
+  @override
+  Future<HttpBaseClientResponse> get(
     Uri uri, {
     Map<String, String>? headers = const {
       "Accept": "application/json",
@@ -97,8 +156,9 @@ abstract class HttpBaseClient {
     );
   }
 
-  /// To make a post request
-  static Future<HttpBaseClientResponse> post(
+  /// Makes a POST request.
+  @override
+  Future<HttpBaseClientResponse> post(
     Uri uri, {
     Map<String, String>? headers = const {
       "Accept": "application/json",
@@ -115,8 +175,9 @@ abstract class HttpBaseClient {
     );
   }
 
-  /// To make a put request
-  static Future<HttpBaseClientResponse> put(
+  /// Makes a PUT request.
+  @override
+  Future<HttpBaseClientResponse> put(
     Uri uri, {
     Map<String, String>? headers = const {
       "Accept": "application/json",
@@ -133,8 +194,9 @@ abstract class HttpBaseClient {
     );
   }
 
-  /// To make a patch request
-  static Future<HttpBaseClientResponse> patch(
+  /// Makes a PATCH request.
+  @override
+  Future<HttpBaseClientResponse> patch(
     Uri uri, {
     Map<String, String>? headers = const {
       "Accept": "application/json",
@@ -151,8 +213,9 @@ abstract class HttpBaseClient {
     );
   }
 
-  /// To make a delete request
-  static Future<HttpBaseClientResponse> delete(
+  /// Makes a DELETE request.
+  @override
+  Future<HttpBaseClientResponse> delete(
     Uri uri, {
     Map<String, String>? headers = const {
       "Accept": "application/json",
@@ -170,9 +233,10 @@ abstract class HttpBaseClient {
   }
 }
 
-/// A Wrapper around the http.Response class.
-/// Will return status -1 if any client side error occurs,
-/// such as NO Internet connection or Socket Exceptions
+/// A wrapper around the http.Response class.
+///
+/// Returns status code -1 when a client-side error occurs,
+/// such as no internet connection or a socket exception.
 class HttpBaseClientResponse {
   /// The HTTP status code for this response.
   final int statusCode;
@@ -222,8 +286,10 @@ class HttpBaseClientResponse {
   /// Returns the parsed JSON or null
   dynamic get data => _parseResponseBody();
 
-  /// Returns asynchronously the parsed JSON or null
-  Future<dynamic> get dataAsFuture async => await _parseResponseBodyAsync();
+  /// Returns the parsed JSON asynchronously or null
+  Future<dynamic> get dataAsFuture async {
+    return await Future<dynamic>.value(_parseResponseBody());
+  }
 
   dynamic _parseResponseBody() {
     if (body.isEmpty) {
@@ -235,10 +301,6 @@ class HttpBaseClientResponse {
     } catch (e) {
       return null;
     }
-  }
-
-  Future<dynamic> _parseResponseBodyAsync() async {
-    return _parseResponseBody();
   }
 
   Map<String, dynamic> _toMap() {
