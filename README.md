@@ -11,138 +11,92 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/developing-packages). 
 -->
 
-A minimalistic http client.
+A minimalistic and lightweight HTTP client for Dart and Flutter.
 ## Features
 
-This package simplifies http requests, making it really easy and simple.
+- Simple and easy-to-use HTTP request API.
+- Supports GET, POST, PUT, PATCH, and DELETE requests.
+- Built-in internet connectivity checker.
+- Synchronous and asynchronous JSON parsing helpers.
+- Lightweight and minimal architecture.
+- Easy to mock and test.
+- Compatible with Mobile, Desktop, and Web platforms.
 
-NOTE: Since dart:io and Socket connections are not supported in web browsers, the checkInternetConnection getter will ALWAYS return true when the code is compiled to JavaScript (Web). For all other platforms (Mobile and Desktop), the socket-based connection check remains fully functional.
+> **Note**
+>
+> Web browsers do not support direct `dart:io` socket connections.
+>
+> Because of this limitation, `checkInternetConnection` always returns `true` on Web platforms.
+>
+> For all other platforms (Mobile and Desktop), the socket-based connection check remains fully functional.
 
 ## Usage
 
 ```dart
-import 'package:flutter/material.dart';
+import 'dart:developer';
 
 import 'package:http_base_client/http_base_client.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+Future<void> main() async {
+  const httpClient = HttpBaseClient();
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  // CHECK INTERNET CONNECTIVITY
+  final hasConnection = await httpClient.checkInternetConnection;
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Test',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
+  if (!hasConnection) {
+    log('No internet connection.');
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({
-    super.key,
-    required this.title,
-  });
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  final _httpClient = const HttpBaseClient();
-
-  String _data = "";
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const SizedBox(
-                  height: 15,
-                ),
-                const Text(
-                  'Press the button to fetch data',
-                ),
-                const SizedBox(
-                  height: 25,
-                ),
-                Text(
-                  _data,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _fetchData,
-        tooltip: 'fetch data',
-        child: const Icon(Icons.download),
-      ),
-    );
+    return;
   }
 
-  Future _fetchData() async {
-    // CHECK INTERNET CONNECTIVITY
-    bool hasConnection = await _httpClient.checkInternetConnection;
+  // MAKING A GET REQUEST
+  final usersResponse = await httpClient.get(
+    Uri.parse(
+      'https://jsonplaceholder.typicode.com/users',
+    ),
+  );
 
-    if (hasConnection) {
-      /// MAKING A GET REQUEST
-      var res = await _httpClient.get(
-        Uri.parse("https://jsonplaceholder.typicode.com/users"),
-      );
+  log('GET STATUS CODE: ${usersResponse.statusCode}');
 
-      if (res.body.isNotEmpty) {
-        setState(() {
-          _data = ObjectConverter.jsonEncode(
-            ObjectConverter.jsonDecode(res.body),
-          );
-        });
-      }
+  if (usersResponse.body.isNotEmpty) {
+    log('GET RESPONSE:');
+    log(
+      ObjectConverter.jsonEncode(
+        usersResponse.data,
+      ),
+    );
+  } else {
+    log('GET RESPONSE IS EMPTY');
+  }
 
-      await Future.delayed(const Duration(seconds: 3));
+  // MAKING A POST REQUEST
+  final requestBody = {
+    'title': 'foo',
+    'body': 'bar',
+    'userId': 1,
+  };
 
-      /// MAKING A POST REQUEST
-      Map<String, dynamic> requestBody = {
-        "title": "foo",
-        "body": "bar",
-        "userId": 1,
-      };
+  final postResponse = await httpClient.post(
+    Uri.parse(
+      'https://jsonplaceholder.typicode.com/posts',
+    ),
+    requestBody: ObjectConverter.jsonEncode(requestBody),
+    headers: {
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+  );
 
-      var res2 = await _httpClient.post(
-        Uri.parse("https://jsonplaceholder.typicode.com/posts"),
-        requestBody: ObjectConverter.jsonEncode(requestBody),
-        headers: {
-          'Content-type': 'application/json; charset=UTF-8',
-        },
-      );
+  log('POST STATUS CODE: ${postResponse.statusCode}');
 
-      if (res2.body.isNotEmpty) {
-        setState(() {
-          _data = ObjectConverter.jsonEncode(
-            ObjectConverter.jsonDecode(res2.body),
-          );
-        });
-      }
-    }
+  if (postResponse.body.isNotEmpty) {
+    log('POST RESPONSE:');
+    log(
+      ObjectConverter.jsonEncode(
+        postResponse.data,
+      ),
+    );
+  } else {
+    log('POST RESPONSE IS EMPTY');
   }
 }
 

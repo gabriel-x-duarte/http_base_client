@@ -1,3 +1,13 @@
+## 1.2.3
+* FEAT: added proper Web compatibility support using conditional exports for platform-specific internet connectivity checks.
+* REFACTOR: removed the direct `dart:io` dependency from the main library entrypoint.
+* REFACTOR: extracted internet connectivity logic into dedicated platform-specific implementations (`IO` and `Web`).
+* REFACTOR: removed the Flutter SDK dependency, making the package a pure Dart package.
+* REFACTOR: replaced Flutter-specific imports with Dart core library imports where applicable.
+* REFACTOR: improved package portability and platform compatibility.
+* REFACTOR: updated the example application to a pure Dart console example.
+* CHORE: general internal cleanup and architecture improvements.
+
 ## 1.2.2
 * FEAT: introduced the `HttpBaseClient` interface contract, enabling easy mocking and dependency abstraction in tests.
 * REFACTOR: converted the HTTP client implementation from static-only methods to an instance-based architecture.

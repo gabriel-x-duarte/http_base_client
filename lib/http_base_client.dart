@@ -3,10 +3,11 @@
 library;
 
 import 'dart:convert' as converter;
-import 'dart:io' show Socket;
+import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+
+import 'src/internet_connection_checker.dart';
 
 /// Defines a minimalistic HTTP client contract.
 abstract interface class HttpBaseClient {
@@ -70,53 +71,14 @@ final class _HttpBaseClient implements HttpBaseClient {
 
   /// Checks whether the device has internet connectivity.
   @override
-  Future<bool> get checkInternetConnection async => await _checkInternetConnection();
-
-  Future<bool> _checkInternetConnection() async {
-    try {
-      const int port = 53;
-
-      // Returns true on Web because dart:io socket checks are not supported.
-      if (kIsWeb) {
-        return true;
-      }
-
-      // Trying to connect with Google ip (8.8.8.8) or Cloudflare (1.1.1.1)
-      return await _trySocketConnection(
-            '8.8.8.8',
-            port,
-          ) ||
-          await _trySocketConnection(
-            '1.1.1.1',
-            port,
-          );
-    } catch (_) {
-      return false;
-    }
-  }
-
-  Future<bool> _trySocketConnection(String host, int port) async {
-    try {
-      final socket = await Socket.connect(
-        host,
-        port,
-        timeout: const Duration(milliseconds: 2000),
-      );
-
-      socket.destroy();
-
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
+  Future<bool> get checkInternetConnection async => await InternetConnectionChecker.check;
 
   /// Generic method to process all requests
   Future<HttpBaseClientResponse> _processRequest(
     Future<http.Response> Function(http.Client client) requestCall,
   ) async {
-    // Verify if internet connection is working
-    if (!await _checkInternetConnection()) {
+    // Verifies internet connectivity
+    if (!await InternetConnectionChecker.check) {
       return HttpBaseClientResponse._fromException(
         "No internet connection",
       );
