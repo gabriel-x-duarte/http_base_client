@@ -11,6 +11,7 @@ import 'src/internet_connection_checker.dart';
 
 /// Defines a minimalistic HTTP client contract.
 abstract interface class HttpBaseClient {
+  /// Creates an HTTP client instance.
   const factory HttpBaseClient() = _HttpBaseClient;
 
   /// Checks whether the device has internet connectivity.
@@ -216,6 +217,7 @@ class HttpBaseClientResponse {
   /// The header names are converted to lowercase and stored with their associated header values.
   final Map<String, String> headers;
 
+  /// Creates an HTTP response instance.
   const HttpBaseClientResponse(
     this.statusCode,
     this.reasonPhrase,
@@ -274,8 +276,10 @@ class HttpBaseClientResponse {
     };
   }
 
+  /// A `Map<String, dynamic>` representation of this object.
   Map<String, dynamic> toMap() => _toMap();
 
+  /// A JSON string representation of this object.
   String toJson() {
     return converter.jsonEncode(_toMap());
   }

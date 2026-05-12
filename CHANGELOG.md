@@ -1,3 +1,9 @@
+## 1.3.2
+* DOCS: improved README feature list organization and overall clarity.
+* DOCS: added missing public API documentation comments required by pub.dev analysis.
+* DOCS: improved inline API documentation consistency and readability.
+* CHORE: minor documentation and formatting improvements.
+
 ## 1.3.1
 * REFACTOR: improved inline documentation formatting and overall readability.
 * REFACTOR: added comprehensive documentation comments to `DataCodec`.

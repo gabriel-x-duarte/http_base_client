@@ -15,12 +15,18 @@ A minimalistic and lightweight HTTP client for Dart and Flutter.
 ## Features
 
 - Simple and easy-to-use HTTP request API.
+- Pure Dart package with no Flutter dependency.
 - Supports GET, POST, PUT, PATCH, and DELETE requests.
-- Built-in internet connectivity checker.
-- Synchronous and asynchronous JSON parsing helpers.
 - Lightweight and minimal architecture.
 - Easy to mock and test.
 - Compatible with Mobile, Desktop, and Web platforms.
+- Built-in internet connectivity checker.
+- Built-in JSON parsing helpers.
+- Includes `DataCodec` utility class for:
+  - JSON encoding and decoding
+  - UTF-8 encoding and decoding
+  - Base64 encoding and decoding
+  - Base64URL encoding and decoding
 
 > **Note**
 >
