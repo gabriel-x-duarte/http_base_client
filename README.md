@@ -61,7 +61,7 @@ Future<void> main() async {
   if (usersResponse.body.isNotEmpty) {
     log('GET RESPONSE:');
     log(
-      ObjectConverter.jsonEncode(
+      DataCodec.jsonEncode(
         usersResponse.data,
       ),
     );
@@ -80,7 +80,7 @@ Future<void> main() async {
     Uri.parse(
       'https://jsonplaceholder.typicode.com/posts',
     ),
-    requestBody: ObjectConverter.jsonEncode(requestBody),
+    requestBody: DataCodec.jsonEncode(requestBody),
     headers: {
       'Content-Type': 'application/json; charset=UTF-8',
     },
@@ -91,7 +91,7 @@ Future<void> main() async {
   if (postResponse.body.isNotEmpty) {
     log('POST RESPONSE:');
     log(
-      ObjectConverter.jsonEncode(
+      DataCodec.jsonEncode(
         postResponse.data,
       ),
     );

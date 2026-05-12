@@ -286,51 +286,51 @@ class HttpBaseClientResponse {
   }
 }
 
-abstract class ObjectConverter {
-  static String jsonEncode(Object source) {
-    final string = converter.json.encode(source);
+abstract final class DataCodec {
+  static String jsonEncode(Object data) {
+    final string = converter.json.encode(data);
 
     return string;
   }
 
-  static dynamic jsonDecode(String source) {
-    final json = converter.json.decode(source);
+  static dynamic jsonDecode(String data) {
+    final json = converter.json.decode(data);
 
     return json;
   }
 
-  static Uint8List utf8Encode(String source) {
-    final chars = converter.utf8.encode(source);
+  static Uint8List utf8Encode(String data) {
+    final chars = converter.utf8.encode(data);
 
     return chars;
   }
 
-  static String utf8Decode(List<int> source) {
-    final string = converter.utf8.decode(source);
+  static String utf8Decode(List<int> data) {
+    final string = converter.utf8.decode(data);
 
     return string;
   }
 
-  static String base64Encode(List<int> source) {
-    final string = converter.base64.encode(source);
+  static String base64Encode(List<int> data) {
+    final string = converter.base64.encode(data);
 
     return string;
   }
 
-  static Uint8List base64Decode(String source) {
-    final chars = converter.base64.decode(source);
+  static Uint8List base64Decode(String data) {
+    final chars = converter.base64.decode(data);
 
     return chars;
   }
 
-  static String base64UrlEncode(List<int> source) {
-    final string = converter.base64Url.encode(source);
+  static String base64UrlEncode(List<int> data) {
+    final string = converter.base64Url.encode(data);
 
     return string;
   }
 
-  static Uint8List base64UrlDecode(String source) {
-    final chars = converter.base64Url.decode(source);
+  static Uint8List base64UrlDecode(String data) {
+    final chars = converter.base64Url.decode(data);
 
     return chars;
   }

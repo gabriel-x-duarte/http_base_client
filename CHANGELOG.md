@@ -1,3 +1,10 @@
+## 1.3.0
+* BREAKING: renamed `ObjectConverter` to `DataCodec` for improved semantic clarity and API consistency.
+* REFACTOR: standardized internal parameter naming from `source` to `data` across all codec utility methods.
+* REFACTOR: improved public API naming and semantics for encoding and decoding helpers.
+* REFACTOR: improved inline documentation comments and overall code readability.
+* CHORE: minor internal cleanup and codebase organization improvements.
+
 ## 1.2.3
 * FEAT: added proper Web compatibility support using conditional exports for platform-specific internet connectivity checks.
 * REFACTOR: removed the direct `dart:io` dependency from the main library entrypoint.
