@@ -110,4 +110,4 @@ Future<void> main() async {
 
 ## Additional information
 
-If you like this package and find it usefull, please give it a like.
+If you like this package and find it useful, please give it a like.
