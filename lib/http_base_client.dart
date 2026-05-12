@@ -286,49 +286,64 @@ class HttpBaseClientResponse {
   }
 }
 
+/// Utility class for common data encoding and decoding operations.
+///
+/// Provides helpers for:
+/// - JSON encoding and decoding
+/// - UTF-8 encoding and decoding
+/// - Base64 encoding and decoding
+/// - Base64URL encoding and decoding
 abstract final class DataCodec {
+  /// Encodes an object into a JSON string.
   static String jsonEncode(Object data) {
     final string = converter.json.encode(data);
 
     return string;
   }
 
+  /// Decodes a JSON string into a Dart object.
   static dynamic jsonDecode(String data) {
     final json = converter.json.decode(data);
 
     return json;
   }
 
+  /// Encodes a string into UTF-8 bytes.
   static Uint8List utf8Encode(String data) {
     final chars = converter.utf8.encode(data);
 
     return chars;
   }
 
+  /// Decodes UTF-8 bytes into a string.
   static String utf8Decode(List<int> data) {
     final string = converter.utf8.decode(data);
 
     return string;
   }
 
+  /// Encodes bytes into a Base64 string.
   static String base64Encode(List<int> data) {
     final string = converter.base64.encode(data);
 
     return string;
   }
 
+  /// Decodes a Base64 string into bytes.
   static Uint8List base64Decode(String data) {
     final chars = converter.base64.decode(data);
 
     return chars;
   }
 
+  /// Encodes bytes into a Base64URL string.
   static String base64UrlEncode(List<int> data) {
     final string = converter.base64Url.encode(data);
 
     return string;
   }
 
+  /// Decodes a Base64URL string into bytes.
   static Uint8List base64UrlDecode(String data) {
     final chars = converter.base64Url.decode(data);
 
