@@ -1,3 +1,8 @@
+## 1.3.1
+* REFACTOR: improved inline documentation formatting and readability.
+* REFACTOR: explicitly typed `_toMap()` map literal with `<String, dynamic>`.
+* CHORE: minor internal code cleanup.
+
 ## 1.3.0
 * BREAKING: renamed `ObjectConverter` to `DataCodec` for improved semantic clarity and API consistency.
 * REFACTOR: standardized internal parameter naming from `source` to `data` across all codec utility methods.

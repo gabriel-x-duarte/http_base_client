@@ -195,9 +195,9 @@ final class _HttpBaseClient implements HttpBaseClient {
   }
 }
 
-/// A wrapper around the http.Response class.
+/// A wrapper around the `http.Response` class.
 ///
-/// Returns status code -1 when a client-side error occurs,
+/// Returns status code `-1` when a client-side error occurs,
 /// such as no internet connection or a socket exception.
 class HttpBaseClientResponse {
   /// The HTTP status code for this response.
@@ -266,7 +266,7 @@ class HttpBaseClientResponse {
   }
 
   Map<String, dynamic> _toMap() {
-    return {
+    return <String, dynamic>{
       "statusCode": statusCode,
       "reasonPhrase": reasonPhrase,
       "body": body,
