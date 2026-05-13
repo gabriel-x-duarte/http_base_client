@@ -1,3 +1,8 @@
+## 1.4.1
+* DOCS: improved README visual spacing and section hierarchy.
+* DOCS: refined HTTP client type section formatting for better readability.
+* DOCS: improved overall README layout and presentation consistency.
+
 ## 1.4.0
 * FEAT: added `PersistentHttpBaseClient` for reusing the same underlying HTTP client across multiple requests.
 * FEAT: added persistent client lifecycle management with `isClosed` and `close()`.
