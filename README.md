@@ -12,29 +12,59 @@ and the Flutter guide for
 -->
 
 A minimalistic and lightweight HTTP client for Dart and Flutter.
+
 ## Features
 
-- Simple and easy-to-use HTTP request API.
-- Pure Dart package with no Flutter dependency.
-- Supports GET, POST, PUT, PATCH, and DELETE requests.
-- Lightweight and minimal architecture.
-- Easy to mock and test.
-- Compatible with Mobile, Desktop, and Web platforms.
-- Built-in internet connectivity checker.
-- Built-in JSON parsing helpers.
+- Simple and easy-to-use HTTP request API
+- Pure Dart package with no Flutter dependency
+- Supports GET, POST, PUT, PATCH, and DELETE requests
+- Lightweight and minimal architecture
+- Easy to mock and test
+- Compatible with Mobile, Desktop, and Web platforms
+- Built-in internet connectivity checker
+- Built-in JSON parsing helpers
+- Supports both:
+  - Auto-disposing HTTP clients
+  - Persistent HTTP clients
 - Includes `DataCodec` utility class for:
   - JSON encoding and decoding
   - UTF-8 encoding and decoding
   - Base64 encoding and decoding
   - Base64URL encoding and decoding
 
+## HTTP Client Types
+
+### `HttpBaseClient`
+
+Creates and closes a new underlying HTTP client
+for each request.
+
+Recommended for:
+- Simple requests
+- Occasional API calls
+- Stateless usage
+
+### `PersistentHttpBaseClient`
+
+Reuses the same underlying HTTP client
+across multiple requests.
+
+Recommended for:
+- Multiple sequential requests
+- Long-lived services
+- Improved connection reuse performance
+
+`close()` must be called when the persistent client is no longer needed.
+
 > **Note**
 >
 > Web browsers do not support direct `dart:io` socket connections.
 >
-> Because of this limitation, `checkInternetConnection` always returns `true` on Web platforms.
+> Because of this limitation, `checkInternetConnection`
+> always returns `true` on Web platforms.
 >
-> For all other platforms (Mobile and Desktop), the socket-based connection check remains fully functional.
+> For all other platforms (Mobile and Desktop),
+> the socket-based connection check remains fully functional.
 
 ## Usage
 
@@ -44,9 +74,10 @@ import 'dart:developer';
 import 'package:http_base_client/http_base_client.dart';
 
 Future<void> main() async {
+  // AUTO-DISPOSING HTTP CLIENT
   const httpClient = HttpBaseClient();
 
-  // CHECK INTERNET CONNECTIVITY
+  // CHECKING INTERNET CONNECTIVITY
   final hasConnection = await httpClient.checkInternetConnection;
 
   if (!hasConnection) {
@@ -66,6 +97,7 @@ Future<void> main() async {
 
   if (usersResponse.body.isNotEmpty) {
     log('GET RESPONSE:');
+
     log(
       DataCodec.jsonEncode(
         usersResponse.data,
@@ -96,6 +128,7 @@ Future<void> main() async {
 
   if (postResponse.body.isNotEmpty) {
     log('POST RESPONSE:');
+
     log(
       DataCodec.jsonEncode(
         postResponse.data,
@@ -104,10 +137,33 @@ Future<void> main() async {
   } else {
     log('POST RESPONSE IS EMPTY');
   }
+
+  // PERSISTENT HTTP CLIENT
+  final persistentHttpClient = PersistentHttpBaseClient();
+
+  final persistentResponse = await persistentHttpClient.get(
+    Uri.parse(
+      'https://jsonplaceholder.typicode.com/posts/1',
+    ),
+  );
+
+  log(
+    'PERSISTENT CLIENT STATUS CODE: '
+    '${persistentResponse.statusCode}',
+  );
+
+  // CLOSING THE PERSISTENT CLIENT
+  persistentHttpClient.close();
+
+  log(
+    'PERSISTENT CLIENT CLOSED: '
+    '${persistentHttpClient.isClosed}',
+  );
 }
 
 ```
 
-## Additional information
+## Additional Information
 
-If you like this package and find it useful, please give it a like.
+If you find this package useful,
+please consider giving it a like.

@@ -3,9 +3,10 @@ import 'dart:developer';
 import 'package:http_base_client/http_base_client.dart';
 
 Future<void> main() async {
+  // AUTO-DISPOSING HTTP CLIENT
   const httpClient = HttpBaseClient();
 
-  // CHECK INTERNET CONNECTIVITY
+  // CHECKING INTERNET CONNECTIVITY
   final hasConnection = await httpClient.checkInternetConnection;
 
   if (!hasConnection) {
@@ -25,6 +26,7 @@ Future<void> main() async {
 
   if (usersResponse.body.isNotEmpty) {
     log('GET RESPONSE:');
+
     log(
       DataCodec.jsonEncode(
         usersResponse.data,
@@ -55,6 +57,7 @@ Future<void> main() async {
 
   if (postResponse.body.isNotEmpty) {
     log('POST RESPONSE:');
+
     log(
       DataCodec.jsonEncode(
         postResponse.data,
@@ -63,4 +66,26 @@ Future<void> main() async {
   } else {
     log('POST RESPONSE IS EMPTY');
   }
+
+  // PERSISTENT HTTP CLIENT
+  final persistentHttpClient = PersistentHttpBaseClient();
+
+  final persistentResponse = await persistentHttpClient.get(
+    Uri.parse(
+      'https://jsonplaceholder.typicode.com/posts/1',
+    ),
+  );
+
+  log(
+    'PERSISTENT CLIENT STATUS CODE: '
+    '${persistentResponse.statusCode}',
+  );
+
+  // CLOSING THE PERSISTENT CLIENT
+  persistentHttpClient.close();
+
+  log(
+    'PERSISTENT CLIENT CLOSED: '
+    '${persistentHttpClient.isClosed}',
+  );
 }

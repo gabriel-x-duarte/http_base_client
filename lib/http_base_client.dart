@@ -11,7 +11,8 @@ import 'src/internet_connection_checker.dart';
 
 /// Defines a minimalistic HTTP client contract.
 abstract interface class HttpBaseClient {
-  /// Creates an HTTP client instance.
+  /// Creates an HTTP client instance that creates and closes
+  /// a new underlying client for each request.
   const factory HttpBaseClient() = _HttpBaseClient;
 
   /// Checks whether the device has internet connectivity.
@@ -67,49 +68,65 @@ abstract interface class HttpBaseClient {
   });
 }
 
-final class _HttpBaseClient implements HttpBaseClient {
-  const _HttpBaseClient();
+/// Defines an HTTP client contract that reuses the same underlying client
+/// across multiple requests.
+abstract interface class PersistentHttpBaseClient implements HttpBaseClient {
+  /// Creates an HTTP client instance that persists across multiple requests.
+  factory PersistentHttpBaseClient() = _PersistentHttpBaseClient;
 
-  /// Checks whether the device has internet connectivity.
+  /// Whether this HTTP client has already been closed.
+  bool get isClosed;
+
+  /// Closes the underlying persistent HTTP client.
+  void close();
+}
+
+/// Provides shared HTTP request behavior for all internal client implementations.
+abstract base class _HttpRequestProcessor implements HttpBaseClient {
+  const _HttpRequestProcessor();
+
+  static const Map<String, String> _defaultHeaders = {
+    "Accept": "application/json",
+    "Content-Type": "application/x-www-form-urlencoded",
+  };
+
   @override
   Future<bool> get checkInternetConnection async => await InternetConnectionChecker.check;
 
   /// Processes all HTTP requests through a shared flow.
   Future<HttpBaseClientResponse> _processRequest(
     Future<http.Response> Function(http.Client client) requestCall,
-  ) async {
-    // Verifies internet connectivity.
-    if (!await InternetConnectionChecker.check) {
-      return HttpBaseClientResponse._fromException(
-        "No internet connection",
-      );
-    }
+  );
 
-    final client = http.Client();
-
-    HttpBaseClientResponse res;
-
-    try {
-      final response = await requestCall(client);
-
-      res = HttpBaseClientResponse._fromHttpResponse(response);
-    } catch (err) {
-      res = HttpBaseClientResponse._fromException(err.toString());
-    } finally {
-      client.close();
-    }
-
-    return res;
+  /// Converts an `http.Response` into a `HttpBaseClientResponse`.
+  HttpBaseClientResponse _processResponse(
+    http.Response response,
+  ) {
+    return HttpBaseClientResponse._fromHttpResponse(
+      response,
+    );
   }
 
-  /// Makes a GET request.
+  /// Converts a request failure or internal error into a `HttpBaseClientResponse`.
+  HttpBaseClientResponse _processException(
+    Object error,
+  ) {
+    return HttpBaseClientResponse._fromException(
+      error.toString(),
+    );
+  }
+
+  /// Creates a response for no internet connection scenarios.
+  HttpBaseClientResponse _processNoInternetConnection() {
+    return HttpBaseClientResponse._fromException(
+      "No internet connection",
+    );
+  }
+
   @override
   Future<HttpBaseClientResponse> get(
     Uri uri, {
-    Map<String, String>? headers = const {
-      "Accept": "application/json",
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
+    Map<String, String>? headers = _defaultHeaders,
   }) async {
     return _processRequest(
       (client) => client.get(
@@ -119,14 +136,10 @@ final class _HttpBaseClient implements HttpBaseClient {
     );
   }
 
-  /// Makes a POST request.
   @override
   Future<HttpBaseClientResponse> post(
     Uri uri, {
-    Map<String, String>? headers = const {
-      "Accept": "application/json",
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
+    Map<String, String>? headers = _defaultHeaders,
     Object? requestBody,
   }) async {
     return _processRequest(
@@ -138,14 +151,10 @@ final class _HttpBaseClient implements HttpBaseClient {
     );
   }
 
-  /// Makes a PUT request.
   @override
   Future<HttpBaseClientResponse> put(
     Uri uri, {
-    Map<String, String>? headers = const {
-      "Accept": "application/json",
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
+    Map<String, String>? headers = _defaultHeaders,
     Object? requestBody,
   }) async {
     return _processRequest(
@@ -157,14 +166,10 @@ final class _HttpBaseClient implements HttpBaseClient {
     );
   }
 
-  /// Makes a PATCH request.
   @override
   Future<HttpBaseClientResponse> patch(
     Uri uri, {
-    Map<String, String>? headers = const {
-      "Accept": "application/json",
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
+    Map<String, String>? headers = _defaultHeaders,
     Object? requestBody,
   }) async {
     return _processRequest(
@@ -176,14 +181,10 @@ final class _HttpBaseClient implements HttpBaseClient {
     );
   }
 
-  /// Makes a DELETE request.
   @override
   Future<HttpBaseClientResponse> delete(
     Uri uri, {
-    Map<String, String>? headers = const {
-      "Accept": "application/json",
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
+    Map<String, String>? headers = _defaultHeaders,
     Object? requestBody,
   }) async {
     return _processRequest(
@@ -193,6 +194,87 @@ final class _HttpBaseClient implements HttpBaseClient {
         body: requestBody,
       ),
     );
+  }
+}
+
+/// Internal HTTP client implementation that creates and disposes
+/// an `http.Client` for each request.
+final class _HttpBaseClient extends _HttpRequestProcessor {
+  const _HttpBaseClient();
+
+  @override
+  Future<HttpBaseClientResponse> _processRequest(
+    Future<http.Response> Function(http.Client client) requestCall,
+  ) async {
+    // Verifies internet connectivity.
+    if (!await InternetConnectionChecker.check) {
+      return _processNoInternetConnection();
+    }
+
+    final client = http.Client();
+
+    HttpBaseClientResponse res;
+
+    try {
+      final response = await requestCall(client);
+
+      res = _processResponse(response);
+    } catch (err) {
+      res = _processException(err);
+    } finally {
+      client.close();
+    }
+
+    return res;
+  }
+}
+
+/// Internal persistent HTTP client implementation that reuses
+/// the same `http.Client` across multiple requests.
+final class _PersistentHttpBaseClient extends _HttpRequestProcessor
+    implements PersistentHttpBaseClient {
+  static const String _closedClientMessage = "HTTP client is closed";
+
+  final http.Client _client;
+
+  bool _isClosed = false;
+
+  _PersistentHttpBaseClient() : _client = http.Client();
+
+  @override
+  bool get isClosed => _isClosed;
+
+  @override
+  Future<HttpBaseClientResponse> _processRequest(
+    Future<http.Response> Function(http.Client client) requestCall,
+  ) async {
+    if (_isClosed) {
+      return _processException(
+        _closedClientMessage,
+      );
+    }
+
+    if (!await InternetConnectionChecker.check) {
+      return _processNoInternetConnection();
+    }
+
+    try {
+      final response = await requestCall(_client);
+
+      return _processResponse(response);
+    } catch (err) {
+      return _processException(err);
+    }
+  }
+
+  @override
+  void close() {
+    if (_isClosed) {
+      return;
+    }
+
+    _client.close();
+    _isClosed = true;
   }
 }
 

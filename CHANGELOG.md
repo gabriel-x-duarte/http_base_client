@@ -1,3 +1,12 @@
+## 1.4.0
+* FEAT: added `PersistentHttpBaseClient` for reusing the same underlying HTTP client across multiple requests.
+* FEAT: added persistent client lifecycle management with `isClosed` and `close()`.
+* DOCS: improved README with HTTP client type explanations.
+* DOCS: updated usage examples to demonstrate persistent client usage and lifecycle management.
+* DOCS: added documentation for auto-disposing and persistent client behaviors.
+* REFACTOR: improved internal request processing organization and shared response handling.
+* CHORE: minor cleanup and documentation consistency improvements.
+
 ## 1.3.2
 * DOCS: improved README feature list organization and overall clarity.
 * DOCS: added missing public API documentation comments required by pub.dev analysis.
