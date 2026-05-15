@@ -70,7 +70,7 @@ Future<void> main() async {
   // PERSISTENT HTTP CLIENT
   final persistentHttpClient = PersistentHttpBaseClient();
 
-  final persistentResponse = await persistentHttpClient.get(
+  final persistentClientResponse = await persistentHttpClient.get(
     Uri.parse(
       'https://jsonplaceholder.typicode.com/posts/1',
     ),
@@ -78,7 +78,7 @@ Future<void> main() async {
 
   log(
     'PERSISTENT CLIENT STATUS CODE: '
-    '${persistentResponse.statusCode}',
+    '${persistentClientResponse.statusCode}',
   );
 
   // CLOSING THE PERSISTENT CLIENT

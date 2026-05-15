@@ -85,6 +85,8 @@ abstract interface class PersistentHttpBaseClient implements HttpBaseClient {
 abstract base class _HttpRequestProcessor implements HttpBaseClient {
   const _HttpRequestProcessor();
 
+  static const String _noInternetConnectionMessage = "No internet connection";
+
   static const Map<String, String> _defaultHeaders = {
     "Accept": "application/json",
     "Content-Type": "application/x-www-form-urlencoded",
@@ -119,7 +121,7 @@ abstract base class _HttpRequestProcessor implements HttpBaseClient {
   /// Creates a response for no internet connection scenarios.
   HttpBaseClientResponse _processNoInternetConnection() {
     return HttpBaseClientResponse._fromException(
-      "No internet connection",
+      _noInternetConnectionMessage,
     );
   }
 
@@ -283,6 +285,10 @@ final class _PersistentHttpBaseClient extends _HttpRequestProcessor
 /// Returns status code `-1` when a client-side error occurs,
 /// such as no internet connection or a socket exception.
 class HttpBaseClientResponse {
+  /// The status code used when a request fails before receiving
+  /// a valid HTTP response, such as no internet connection or a socket exception.
+  static const int clientSideErrorStatusCode = -1;
+
   /// The HTTP status code for this response.
   final int statusCode;
 
@@ -294,27 +300,32 @@ class HttpBaseClientResponse {
   /// This is converted from [bodyBytes] using the charset parameter of the Content-Type header field, if available. If it's unavailable or if the encoding name is unknown, [latin1] is used by default, as per RFC 2616.
   final String body;
 
+  /// The bytes comprising the body of this response.
+  final Uint8List bodyBytes;
+
   /// The HTTP headers returned by the server.
   ///
   /// The header names are converted to lowercase and stored with their associated header values.
   final Map<String, String> headers;
 
   /// Creates an HTTP response instance.
-  const HttpBaseClientResponse(
-    this.statusCode,
-    this.reasonPhrase,
-    this.body,
-    this.headers,
-  );
+  const HttpBaseClientResponse({
+    required this.statusCode,
+    required this.reasonPhrase,
+    required this.body,
+    required this.bodyBytes,
+    required this.headers,
+  });
 
   factory HttpBaseClientResponse._fromHttpResponse(
     http.Response response,
   ) {
     return HttpBaseClientResponse(
-      response.statusCode,
-      response.reasonPhrase ?? "",
-      response.body,
-      response.headers,
+      statusCode: response.statusCode,
+      reasonPhrase: response.reasonPhrase ?? "",
+      body: response.body,
+      bodyBytes: response.bodyBytes,
+      headers: response.headers,
     );
   }
 
@@ -322,19 +333,28 @@ class HttpBaseClientResponse {
     String? message,
   ) {
     return HttpBaseClientResponse(
-      -1,
-      message ?? "",
-      "",
-      {},
+      statusCode: clientSideErrorStatusCode,
+      reasonPhrase: message ?? "",
+      body: "",
+      bodyBytes: Uint8List(0),
+      headers: <String, String>{},
     );
   }
+
+  /// Whether this response represents a successful HTTP status code
+  /// in the 200-299 range.
+  bool get isSuccessStatusCode => statusCode >= 200 && statusCode < 300;
+
+  /// Whether this response represents a failure before receiving
+  /// a valid HTTP response, such as no internet connection or a socket exception.
+  bool get isClientSideError => statusCode == clientSideErrorStatusCode;
 
   /// Returns the parsed JSON or null.
   dynamic get data => _parseResponseBody();
 
   /// Returns the parsed JSON asynchronously or null.
   Future<dynamic> get dataAsFuture async {
-    return await Future<dynamic>.value(_parseResponseBody());
+    return _parseResponseBody();
   }
 
   dynamic _parseResponseBody() {
@@ -343,12 +363,14 @@ class HttpBaseClientResponse {
     }
 
     try {
-      return converter.json.decode(body);
+      return DataCodec.jsonDecode(body);
     } catch (e) {
       return null;
     }
   }
 
+  /// `bodyBytes` is intentionally omitted to avoid
+  /// large binary payload serialization.
   Map<String, dynamic> _toMap() {
     return <String, dynamic>{
       "statusCode": statusCode,
@@ -363,7 +385,7 @@ class HttpBaseClientResponse {
 
   /// A JSON string representation of this object.
   String toJson() {
-    return converter.jsonEncode(_toMap());
+    return DataCodec.jsonEncode(_toMap());
   }
 
   @override

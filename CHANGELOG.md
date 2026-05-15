@@ -1,3 +1,16 @@
+## 2.0.0
+* BREAKING: migrated `HttpBaseClientResponse` constructor from positional parameters to named parameters.
+* FEAT: added `bodyBytes` support to `HttpBaseClientResponse`.
+* FEAT: added `isSuccessStatusCode` helper for successful HTTP status code checks.
+* FEAT: added `isClientSideError` helper for client-side failure detection.
+* FEAT: added `clientSideErrorStatusCode` constant for standardized client-side error handling.
+* FEAT: kept `bodyBytes` available as a direct response property while intentionally omitting it from `toMap()` and `toJson()` to avoid large binary payload serialization.
+* REFACTOR: improved internal response parsing consistency using `DataCodec`.
+* DOCS: improved public API documentation comments and response behavior explanations.
+* DOCS: improved README structure, persistent client explanations, usage examples, and client-side error documentation.
+* DOCS: improved example readability and variable naming consistency.
+* CHORE: general cleanup and consistency improvements across the package.
+
 ## 1.4.1
 * DOCS: improved README visual spacing and section hierarchy.
 * DOCS: refined HTTP client type section formatting for better readability.

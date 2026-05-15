@@ -33,15 +33,24 @@ Recommended for:
 
 #### `PersistentHttpBaseClient`
 
-Reuses the same underlying HTTP client
+Reuses the same underlying HTTP client instance
 across multiple requests.
 
 Recommended for:
 - Multiple sequential requests
 - Long-lived services
-- Improved connection reuse performance
+- Improved performance through connection reuse
 
 `close()` must be called when the persistent client is no longer needed.
+
+## Client-side Errors
+
+When a request fails before receiving a valid HTTP response
+(such as no internet connection or a socket exception),
+the package returns:
+
+- `statusCode = -1`
+- `isClientSideError = true`
 
 <br>
 
@@ -49,8 +58,9 @@ Recommended for:
 >
 > Web browsers do not support direct `dart:io` socket connections.
 >
-> Because of this limitation, `checkInternetConnection`
-> always returns `true` on Web platforms.
+> Because of this limitation,
+> `checkInternetConnection` always returns `true`
+> on Web platforms.
 >
 > For all other platforms (Mobile and Desktop),
 > the socket-based connection check remains fully functional.
@@ -130,7 +140,7 @@ Future<void> main() async {
   // PERSISTENT HTTP CLIENT
   final persistentHttpClient = PersistentHttpBaseClient();
 
-  final persistentResponse = await persistentHttpClient.get(
+  final responseFromPersistentClient = await persistentHttpClient.get(
     Uri.parse(
       'https://jsonplaceholder.typicode.com/posts/1',
     ),
@@ -138,7 +148,7 @@ Future<void> main() async {
 
   log(
     'PERSISTENT CLIENT STATUS CODE: '
-    '${persistentResponse.statusCode}',
+    '${responseFromPersistentClient.statusCode}',
   );
 
   // CLOSING THE PERSISTENT CLIENT
