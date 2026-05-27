@@ -1,3 +1,8 @@
+## 2.0.1
+* REFACTOR: reused `checkInternetConnection` getter in internal request processing.
+* DOCS: synchronized README usage example with the package example file.
+* CHORE: minor consistency improvements.
+
 ## 2.0.0
 * BREAKING: migrated `HttpBaseClientResponse` constructor from positional parameters to named parameters.
 * FEAT: added `bodyBytes` support to `HttpBaseClientResponse`.

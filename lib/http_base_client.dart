@@ -209,7 +209,7 @@ final class _HttpBaseClient extends _HttpRequestProcessor {
     Future<http.Response> Function(http.Client client) requestCall,
   ) async {
     // Verifies internet connectivity.
-    if (!await InternetConnectionChecker.check) {
+    if (!await checkInternetConnection) {
       return _processNoInternetConnection();
     }
 
@@ -256,7 +256,7 @@ final class _PersistentHttpBaseClient extends _HttpRequestProcessor
       );
     }
 
-    if (!await InternetConnectionChecker.check) {
+    if (!await checkInternetConnection) {
       return _processNoInternetConnection();
     }
 

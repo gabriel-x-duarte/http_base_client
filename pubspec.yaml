@@ -1,6 +1,6 @@
 name: http_base_client
 description: A minimalistic HTTP client wrapped around the Dart http package.
-version: 2.0.0
+version: 2.0.1
 homepage: https://github.com/gabriel-x-duarte/http_base_client
 
 environment:
