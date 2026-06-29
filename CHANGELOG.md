@@ -1,3 +1,7 @@
+## 2.0.2
+
+* CHORE: align SDK constraints with Dart 3 and Flutter 3.10 compatibility
+
 ## 2.0.1
 * REFACTOR: reused `checkInternetConnection` getter in internal request processing.
 * DOCS: synchronized README usage example with the package example file.
